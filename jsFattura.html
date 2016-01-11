@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h1>Fattura con JavaScript</h1>
+
+<p>Digitare importo: <input id="numb" type="number"> <output id="demo"></output></p>
+
+ <!-- PROVVISORIO: bisogna selezionare il cliente da una lista -->
+<p>Digitare numero cliente: <input id="cliente" type="number"> <output id="demo2"></output></p>	
+
+<button type="button" onclick="verificaInput()">Calcola</button>
+<button type="button" onclick="esci()">Esci</button>
+
+<div id="buu" style="display:none">
+ 
+<p id="importo"></p>
+<p id="inps"></p>
+<p id="imponibile"></p>
+<p id="iva"></p>
+<p id="imponibile con iva"></p>
+<p id="ritenuta"></p>
+<p id="totale da pagare"></p>
+<form method="post" action="MemorizzaFattura.php" name="f1"> 
+	Il tuo nome: <input type="text" name="name"> 
+	La tua email: <input type="text" name="email"> <input type="hidden" name="importo">
+	<input type="submit" class="button" id="boo" name="nuova" value="Memorizza"> </form>
+</div>
+
+<script>
+
+function esci() {
+	//sostituisce la finestra con una di saluto. Così comunque non funziona (lo script rimane attivo).
+	var myWindow = window.open("", "_self");
+    myWindow.document.write("<p>Arrivederci.</p>");
+}
+
+function verificaInput() {
+	//controlla se l'input è valido. Se sì, attiva la funzione di calcolo.
+    var x, importo, inps, imponibile, iva, imponibileIva, ritenuta, aPagare = 0;
+
+	document.getElementById("demo").innerHTML = "";
+	document.getElementById("demo2").innerHTML = "";
+	document.getElementById("importo").innerHTML = "";
+	document.getElementById("inps").innerHTML = "";
+	document.getElementById("imponibile").innerHTML = "";
+	document.getElementById("iva").innerHTML = "";
+	document.getElementById("imponibile con iva").innerHTML = "";
+	document.getElementById("ritenuta").innerHTML = "";
+	document.getElementById("totale da pagare").innerHTML = "";
+
+
+    // Get the value of the input field with id="numb"
+    x = document.getElementById("numb").value;
+    
+    // Get the value of the input field with id="cliente"
+    y = document.getElementById("cliente").value;
+    
+    // If Cliente is Not null is Not a Number or less than one
+    if (isNaN(y)) {
+    	ocument.getElementById("demo2").innerHTML = "Cliente non inserito";
+    }
+    	else if (y != "1") {
+    		document.getElementById("demo2").innerHTML = "Cliente non valido";
+        document.getElementById("buu").style.display = "none";
+    	}  
+
+    // If x is Not a Number or less than one
+    if (isNaN(x) || x < 1) {
+        document.getElementById("demo").innerHTML = "Input non valido";
+        document.getElementById("buu").style.display = "none";
+    } else {
+        calcoloFattura(x);       
+    }
+}
+
+function calcoloFattura(x) {
+
+	importo = Number(x);
+	document.getElementById("demo").innerHTML = "";
+    document.getElementById("importo").innerHTML = "importo digitato: " + importo;
+    //calcolo addizionale inps
+    inps = (importo * 0.04).toFixed(2);
+    document.getElementById("inps").innerHTML = "Inps (4%): " + inps;
+    //imponibile (importo base + addizionale inps)
+    imponibile = (Number(importo) + Number(inps)).toFixed(2);
+    document.getElementById("imponibile").innerHTML = "Imponibile: " + imponibile;
+    //iva (22% imponibile)
+    iva = (Number(imponibile) * 0.22).toFixed(2);
+    document.getElementById("iva").innerHTML = "Iva (22%): " + iva;
+    //imponibileIva (imponibile + iva)
+    imponibileIva = (Number(imponibile) + Number(iva)).toFixed(2);
+    document.getElementById("imponibile con iva").innerHTML = "Imponibile con Iva: " + imponibileIva;
+    ///ritenuta d'acconto (20% imponibile)
+    ritenuta = (Number(imponibile) * 0.20).toFixed(2);
+    document.getElementById("ritenuta").innerHTML = "Ritenuta d'acconto (20%): " + ritenuta;
+    //aPagare (imponibileIva - ritenuta)
+    aPagare = (Number(imponibileIva) - Number(ritenuta)).toFixed(2);
+    document.getElementById("totale da pagare").innerHTML = "Totale da pagare: " + aPagare;
+    
+    /*preparazione per richiamo funzione php. Il parametro di richiamo viene valorizzato, il form con il 
+    pulsante per memorizzare la fattura viene visualizzato.
+    */
+    document.forms["f1"].elements["importo"].value = importo;
+    document.getElementById("buu").style.display = "block";
+}
+
+</script>
